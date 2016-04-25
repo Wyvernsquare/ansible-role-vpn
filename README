@@ -1,9 +1,8 @@
 Introduction
 ---------------------------------
-This project is an example ansible project, showing how server testing should be conducted before deploying. The testing should:
+This project is an example ansible project, demonstrating Windows Active Directory deployment via Ansible and Vagrant.
 
-test actual system's behaviors
-test externally, not from the server itself (in most cases)
+It will create a private internal network between all the servers, with a working DNS server and fully AD-managed environment.
 ---------------------------------
 
 Requirements
