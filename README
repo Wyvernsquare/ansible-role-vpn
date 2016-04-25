@@ -1,3 +1,24 @@
+Introduction
+---------------------------------
+This project is an example ansible project, showing how server testing should be conducted before deploying. The testing should:
+
+test actual system's behaviors
+test externally, not from the server itself (in most cases)
+---------------------------------
+
+Requirements
+---------------------------------
+Install the following packages.
+
+ansible (>= 1.8.x)
+vagrant
+virtualbox
+Make sure 192.168.1.0/24 is not used in your network. If it is, modify the IP addresses in Vagrantfile.
+
+Make sure your access line is not pay-as-you-go. The scripts will download a lot of files.
+---------------------------------
+
+Installing
 The necessary scripts are included in this project. 
 
 Start your instance by running "vagrant up" and this will download the necessary Windows Server 2012 R2 image and create a total of four servers: server1,server2,server3, and server4 respectively. Please keep in mind that the box image is around 6GB and it WILL take a while to download and provision these boxes.
