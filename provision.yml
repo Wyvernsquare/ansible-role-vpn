@@ -13,3 +13,10 @@
     domain: "reallyenglish.local"
   roles: 
    - dc
+- hosts: wsus
+  vars:
+    username: Administrator
+    password: vagrant
+    domain: "reallyenglish.local"
+  roles: 
+   - wsus

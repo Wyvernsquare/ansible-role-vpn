@@ -5,7 +5,7 @@
 
 param($u,$p,$d)
 
-$domainname = "reallyenglish"
+$domainname = $d
 $u = "$domainname\$u"
 
 $securePassword = ConvertTo-SecureString -String $p -AsPlainText -Force

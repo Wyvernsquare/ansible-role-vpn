@@ -2,7 +2,7 @@
 param($u,$p,$d)
 
 # Domain Variables
-$DomainName = "reallyenglish.local"
+$DomainName = $d
 $DomainMode = "Win2012"
 $ForestMode = "Win2012"
 

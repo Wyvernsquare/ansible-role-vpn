@@ -7,6 +7,27 @@
   script: "../../../ps-scripts/client-djoin.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
   ignore_errors: yes
 - name: Restart Machine
-  script: ../../../ps-scripts/shutdown.ps1
+  script: ../../../ps-scripts/restart.ps1
   ignore_errors: yes
-- pause: minutes=3
+- name: waiting for server to come back
+  local_action:
+    module: wait_for
+    host: "{{ inventory_hostname }}"
+    port: 5985
+    delay: 10
+    timeout: 500
+    state: started
+- name: Install and Configure WSUS
+  script: ../../../ps-scripts/configure-wsus.ps1
+- name: Restart Machine
+  script: ../../../ps-scripts/restart.ps1
+  ignore_errors: yes
+#- pause: minutes=7
+- name: waiting for server to come back
+  local_action:
+    module: wait_for
+    host: "{{ inventory_hostname }}"
+    port: 5985
+    delay: 10
+    timeout: 500
+    state: started

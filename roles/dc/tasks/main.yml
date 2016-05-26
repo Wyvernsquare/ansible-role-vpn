@@ -9,11 +9,25 @@
 - name: Restart Machine 
   script: ../../../ps-scripts/restart.ps1
   ignore_errors: yes
-- pause: minutes=3
+- name: waiting for server to come back
+  local_action:
+    module: wait_for
+    host: "{{ inventory_hostname }}"
+    port: 5985
+    delay: 10
+    timeout: 500
+    state: started
 - name: Promote to Domain Controller
   script: "../../../ps-scripts/Promote-DC.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
   ignore_errors: yes
 - name: Restart Machine 
   script: ../../../ps-scripts/restart.ps1
   ignore_errors: yes
-- pause: minutes=5
+- name: waiting for server to come back
+  local_action:
+    module: wait_for
+    host: "{{ inventory_hostname }}"
+    port: 5985
+    delay: 10
+    timeout: 500
+    state: started
