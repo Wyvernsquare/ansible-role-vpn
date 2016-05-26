@@ -5,7 +5,7 @@
   script: ../../../ps-scripts/Set-IntnetSettings.ps1
 - name: Join domain script
   script: "../../../ps-scripts/client-djoin.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
-  ignore_errors: true
+  ignore_errors: yes
 - name: Restart Machine 
   script: ../../../ps-scripts/restart.ps1
   ignore_errors: yes
