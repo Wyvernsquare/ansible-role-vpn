@@ -1,9 +1,12 @@
 # Windows PowerShell script for AD DS Deployment
+param($u,$p,$d)
 
 # Domain Variables:
 $DomainName = "reallyenglish.local"
 $DomainMode = "Win2012"
 $ForestMode = "Win2012"
+
+$u = "$domainname\$u"
 
 #AD Admin Password
 $admpw = "V@grant1" | ConvertTo-SecureString -AsPlainText -Force

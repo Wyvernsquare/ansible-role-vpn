@@ -1,0 +1,15 @@
+---
+- hosts: dc1
+  vars:
+    username: Administrator
+    password: vagrant
+    domain: "reallyenglish.local"
+  roles: 
+   - rdc
+- hosts: dc2
+  vars:
+    username: Administrator
+    password: vagrant
+    domain: "reallyenglish.local"
+  roles: 
+   - dc

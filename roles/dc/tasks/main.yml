@@ -1,0 +1,19 @@
+---
+# Joins Server to Domain and Promotes to Domain Controller
+
+- name: Configure Internal Network settings
+  script: ../../../ps-scripts/Set-IntnetSettings.ps1
+- name: Join domain script
+  script: "../../../ps-scripts/client-djoin.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
+  ignore_errors: true
+- name: Restart Machine 
+  script: ../../../ps-scripts/restart.ps1
+  ignore_errors: yes
+- pause: minutes=3
+- name: Promote to Domain Controller
+  script: "../../../ps-scripts/Promote-DC.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
+  ignore_errors: yes
+- name: Restart Machine 
+  script: ../../../ps-scripts/restart.ps1
+  ignore_errors: yes
+- pause: minutes=5

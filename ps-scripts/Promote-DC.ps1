@@ -1,5 +1,5 @@
 # Windows PowerShell script for AD DS Deployment
-param($u,$p)
+param($u,$p,$d)
 
 # Domain Variables
 $DomainName = "reallyenglish.local"

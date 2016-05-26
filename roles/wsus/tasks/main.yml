@@ -1,0 +1,12 @@
+---
+# Joins Server to Domain and Sets up as Windows Server Update Services
+
+- name: Configure Internal Network settings
+  script: ../../../ps-scripts/Set-IntnetSettings.ps1
+- name: Join domain script
+  script: "../../../ps-scripts/client-djoin.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
+  ignore_errors: yes
+- name: Restart Machine
+  script: ../../../ps-scripts/shutdown.ps1
+  ignore_errors: yes
+- pause: minutes=3

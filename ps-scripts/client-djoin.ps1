@@ -3,7 +3,7 @@
 # Joins clients/servers to a domain
 #
 
-param($u,$p)
+param($u,$p,$d)
 
 $domainname = "reallyenglish"
 $u = "$domainname\$u"

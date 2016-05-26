@@ -10,17 +10,16 @@
     - name: Install and Configure WSUS
       script: ./ps-scripts/configure-wsus.ps1
     - name: Restart Machine
-      script: ./ps-scripts/shutdown.ps1
+      script: ./ps-scripts/restart.ps1
       ignore_errors: yes
-    - pause: minutes=7
-    # - name: waiting for server to come back
-      # local_action:
-        # module: wait_for
-        # host: "{{ inventory_hostname }}"
-        # delay: 10
-        # timeout: 300
-        # state: started
-        # ignore_errors: yes
+    #- pause: minutes=7
+    - name: waiting for server to come back
+      local_action:
+        module: wait_for
+        host: "{{ inventory_hostname }}"
+        delay: 10
+        timeout: 500
+        state: started
 
 # run windows update all the boxes
 # - include: win-updates.yml

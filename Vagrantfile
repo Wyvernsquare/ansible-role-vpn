@@ -7,49 +7,45 @@ VAGRANTFILE_API_VERSION = "2"
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "mwrock/Windows2012R2"
-  config.vm.guest = :windows
 
   N = 4
   VAGRANT_VM_PROVIDER = "virtualbox"
   ANSIBLE_RAW_SSH_ARGS = []
 
   (1..N-1).each do |machine_id|
-    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/machine#{machine_id}/#{VAGRANT_VM_PROVIDER}/private_key"
+    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server#{machine_id}/#{VAGRANT_VM_PROVIDER}/private_key"
   end
+
+  # Set-up Management Machine
+  config.vm.box = "centos/7"
+  config.vm.hostname = "mgmt01"
+  config.vm.define "server1"
+  config.vm.network "private_network", ip: "192.168.1.10", netmask: "255.255.0.0"
   
-  (1..N).each do |machine_id|
-     config.vm.define "server#{machine_id}" do |machine|
-	 if machine_id  < 3 
+  (2..N).each do |machine_id|
+  config.vm.define "server#{machine_id}" do |machine|
+    machine.vm.box = "mwrock/Windows2012R2"
+    machine.vm.guest = :windows
+    # Set-up WinRM and RDP for Windows Machines
+    machine.vm.communicator = "winrm"
+    machine.winrm.username = "Administrator"
+    machine.winrm.password = "vagrant"
+    # Port forward WinRM and RDP (changed values to NOT conflict with host)
+    machine.vm.network "forwarded_port", host: 33389, guest: 3389, id: "rdp", auto_correct: true
+    machine.vm.network "forwarded_port", host: 5987, guest: 5985, id: "winrm", auto_correct: true
+	 if machine_id  < N-1 && machine_id > 1
 	     machine.vm.hostname = "dc#{machine_id}"
 	 end
-	 if machine_id == 3
+	 if machine_id == N-1
 	     machine.vm.hostname = "wsus"
 	 end
-	 if machine_id == 4
-	     machine.vm.hostname = "client"
-	 end
-     machine.vm.network "private_network", ip: "192.168.1.#{10+machine_id}", netmask: "255.255.0.0"
+
+     machine.vm.network "private_network", ip: "192.168.1.#{9+machine_id}", netmask: "255.255.0.0"
   
      # Create a forwarded port mapping which allows access to a specific port
      # within the machine from a port on the host machine. In the example below,
      # accessing "localhost:8080" will access port 80 on the guest machine.
-      config.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
-	
-     machine.vm.communicator = "winrm"
-     machine.winrm.username = "Administrator"
-     machine.winrm.password = "vagrant"
-	 # Port forward WinRM and RDP (changed values to NOT conflict with host)
-     machine.vm.network "forwarded_port", host: 33389, guest: 3389, id: "rdp", auto_correct: true
-     machine.vm.network "forwarded_port", guest: 5985, host: 5987, id: "winrm", auto_correct: true
-  
-     # These are for IIS
-     #machine.vm.network "forwarded_port", host: 8080, guest: 80
-     #machine.vm.network "forwarded_port", host: 4443, guest: 443
-
-     # Create a private network, which allows host-only access to the machine
-     # using a specific IP.
-      #machine.vm.network "private_network", ip: "192.168.1.10", netmask: "255.255.0.0"
+      machine.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
 
      # Customize the amount of memory on the VM:
      #vb.memory = "1024"
@@ -61,13 +57,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         machine.vm.provision :ansible do |ansible|
            #Disable default limit to connect to all the machines
            ansible.limit = "all"
-           ansible.playbook = "pre-scripts.yml"
+           ansible.playbook = "provision.yml"
            ansible.inventory_path = "statichosts"
            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-		end
+		    end
        end
-      end
-     end
+    end
+   end
 	
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is

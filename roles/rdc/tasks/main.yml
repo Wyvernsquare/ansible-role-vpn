@@ -1,0 +1,15 @@
+---
+# Creates Forest and Domain, and set as Primary Domain Controller 
+
+- name: Configure Internal Network settings
+  script: ../../../ps-scripts/Set-IntnetSettings.ps1
+- name: Create New Forest and Domain Controller
+  script: "../../../ps-scripts/Create-NewDomain.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
+  ignore_errors: yes
+- name: Restart Machine 
+  script: ../../../ps-scripts/restart.ps1
+  ignore_errors: yes
+- pause: minutes=7
+- name: Re-configure DNS address because promoted DC loses DNS config
+  script: ../../../ps-scripts/Set-IntnetSettings.ps1
+  ignore_errors: yes
