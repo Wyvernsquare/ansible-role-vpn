@@ -12,6 +12,7 @@ Install the following packages.
 ansible (>= 1.8.x)
 vagrant
 virtualbox
+python needs to be install as well, then make sure the following libraries are installed: xmltodict, pywinrm
 Make sure 192.168.1.0/24 is not used in your network. If it is, modify the IP addresses in Vagrantfile.
 
 Make sure your access line is not pay-as-you-go. The scripts will download a lot of files.
@@ -46,3 +47,9 @@ servers 1 to 4 have the respective IP addresses: 192.168.1.11, 192.168.1.12, 192
 ---------------------------------
 
 You can change the statichosts file to specify vagrant provisioning if you need to, however your ansible-playbook instance may be using /etc/ansible/hosts so you will need to modify that file to reflect what's in statichosts in order to run separate playbooks after Vagrant provisioning.
+
+
+Notes
+---------------------------------
+In some ansible scripts, ignore_error flag has been included as the commands occasionally will throw an unauthorized error but still perform to completion. The non-inclusion of this flag will cause the script to fail even though there is not an issue with task execution. Check winrm-error file for specific error
+---------------------------------
