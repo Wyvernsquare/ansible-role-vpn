@@ -6,41 +6,85 @@ VAGRANTFILE_API_VERSION = "2"
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  N = 4
+  # Number of total servers
+  N = 5
+  # Windows Servers starting from position number Nth
+  winsrvN = 3
+  # Network Settings
+  nwadr = "10.0.1"
+  lastoctet_initadr = 10
+  masklength = 16
+  dns = "10.0.1.12"
+  # Windows Server Settings
+  username = "Administrator"
+  password = "vagrant"
+  domain = "reallyenglish.local"
+
+
+  # Open file writing pipe for ansible inventory file
+  require "fileutils"
+  f = File.open("hosts","w")
+  allvars = File.open("group_vars/all", "w")
+  allvars.puts "username: #{username}"
+  allvars.puts "password: #{password}"
+  allvars.puts "domain: #{domain}"
+  allvars.puts "gw: #{nwadr}.1"
+  allvars.puts "dns: #{dns}"
+  allvars.puts "netmask: #{masklength}"
+
+  # VM variables
   VAGRANT_VM_PROVIDER = "virtualbox"
   ANSIBLE_RAW_SSH_ARGS = []
-
   (1..N-1).each do |machine_id|
     ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server#{machine_id}/#{VAGRANT_VM_PROVIDER}/private_key"
   end
 
   # Set-up Management Machine
   config.vm.box = "centos/7"
-  config.vm.hostname = "mgmt01"
+  config.vm.hostname = "mgmt1"
   config.vm.define "server1"
-  config.vm.network "private_network", ip: "192.168.1.10", netmask: "255.255.0.0"
+  config.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr}", netmask: "255.255.0.0"
+  f.puts "[mgmt1]"
+  f.puts "#{nwadr}.#{lastoctet_initadr}"
   
-  (2..N).each do |machine_id|
+  # Set up VPN Server
+  config.vm.box = "centos/7"
+  config.vm.hostname = "vpn1"
+  config.vm.define "server2"
+  config.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr+1}", netmask: "255.255.0.0"
+  f.puts "[vpn1]"
+  f.puts "#{nwadr}.#{lastoctet_initadr+1}"
+
+  # Set up Windows Servers
+  i = 1
+  (winsrvN..N).each do |machine_id|
   config.vm.define "server#{machine_id}" do |machine|
     machine.vm.box = "mwrock/Windows2012R2"
     machine.vm.guest = :windows
     # Set-up WinRM and RDP for Windows Machines
     machine.vm.communicator = "winrm"
-    machine.winrm.username = "Administrator"
-    machine.winrm.password = "vagrant"
+    machine.winrm.username = "#{username}"
+    machine.winrm.password = "#{password}"
     # Port forward WinRM and RDP (changed values to NOT conflict with host)
     machine.vm.network "forwarded_port", host: 33389, guest: 3389, id: "rdp", auto_correct: true
     machine.vm.network "forwarded_port", host: 5987, guest: 5985, id: "winrm", auto_correct: true
-	 if machine_id  < N-1 && machine_id > 1
-	     machine.vm.hostname = "dc#{machine_id}"
+	 if machine_id  < N && machine_id > 1
+	     machine.vm.hostname = "dc#{i}"
+       f.puts "[dc#{i}]"
+       f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
+       if i == 1 
+        allvars.puts "dns: #{nwadr}.#{lastoctet_initadr-1+machine_id}"
+       end
 	 end
-	 if machine_id == N-1
+	 if machine_id == N
 	     machine.vm.hostname = "wsus"
+       f.puts "[wsus]"
+       f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
 	 end
-
-     machine.vm.network "private_network", ip: "192.168.1.#{9+machine_id}", netmask: "255.255.0.0"
+     machine.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr-1+machine_id}", netmask: "255.255.0.0"
   
      # Create a forwarded port mapping which allows access to a specific port
      # within the machine from a port on the host machine. In the example below,
@@ -54,17 +98,41 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
      # Only execute once the Ansible provisioner,
      # when all the machines are up and ready.
        if machine_id == N
+        # Provision with Ansible
         machine.vm.provision :ansible do |ansible|
            #Disable default limit to connect to all the machines
            ansible.limit = "all"
            ansible.playbook = "provision.yml"
-           ansible.inventory_path = "statichosts"
+           ansible.inventory_path = "hosts"
+           ansible.verbose = "-v"
            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
 		    end
+        
+        # Write list of servers
+        f.puts "[allservers:children]"
+        (winsrvN..N).each do |num|
+          if num < N
+            f.puts "dc#{num-winsrvN+1}"
+          end
+        end
+        f.puts "wsus"
+        f.puts "[allservers:vars]"
+        f.puts "ansible_ssh_user=Administrator"
+        f.puts "ansible_ssh_pass=vagrant"
+        f.puts "ansible_connection=winrm"
+        f.puts "ansible_ssh_port=5985"
+        f.puts "ansible_winrm_server_cert_validation=ignore"
+
+       # close inventory file writing pipe
+       f.close
+       # close group variable file writing pipe
+       allvars.close
        end
+
+
+   i = i+1
     end
    end
-	
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third

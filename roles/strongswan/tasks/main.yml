@@ -1,0 +1,66 @@
+---
+#install & config ikev2 server
+
+- name: Enforce strongswan is installed
+  yum: pkg={{ item }} state=installed
+  with_items:
+    - strongswan
+    - strongswan-plugin-xauth-generic
+    - strongswan-plugin-xauth-eap
+    - strongswan-plugin-eap-md5
+    - strongswan-plugin-eap-mschapv2
+    - strongswan-plugin-eap-radius
+  notify: restart ipsec
+  tags:
+    - ipsec
+
+- include: openvz.yml
+  when: ansible_virtualization_role == "guest" and ansible_virtualization_type == "openvz"
+
+- name:  Upload IPSec config files
+  template: src={{ item }}
+            dest=/etc/{{ item }}
+            owner=root group=root mode=0644
+  with_items:
+    - ipsec.conf
+    - strongswan.conf
+    - ipsec.secrets
+  notify: restart ipsec
+  tags:
+    - ipsec
+
+- include: gen_cert.yml
+  when: ipsec_enable_ikev2 and ipsec_cert_source == "gen"
+
+- include: upload_cert.yml
+  when: ipsec_enable_ikev2 and (ipsec_cert_source == "local" or ipsec_cert_source == "upload")
+
+- include: sync_cert.yml
+  when: ipsec_enable_ikev2 and ipsec_cert_source == "remote"
+
+#- include: copy_cert.yml
+#  when: ipsec_enable_ikev2 and ipsec_cert_source == "pki"
+
+- include: ios8.yml
+  when: ipsec_enable_ikev2 and ipsec_gen_ios8_profile
+
+- include: osx.yml
+  when: ipsec_enable_ikev2
+
+- name: make sure /opt/easynat exists
+  action: file path=/opt/easynat/ state=directory
+  tags:
+    - ipsec
+    - nat
+
+- name: set network in easynat rule file
+  action: lineinfile dest=/opt/easynat/rules.cnf
+                     regexp="{{ ipsec_subnet }}"
+                     line="{{ ipsec_subnet }}"
+                     state=present
+                     create=yes
+  notify:
+    - setup nat rules
+  tags:
+    - ipsec
+    - nat

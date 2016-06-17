@@ -1,8 +1,9 @@
----
-# Sets up a server as Windows Server Update Services
-- name: Install and Configure WSUS
-  script: ../../../ps-scripts/configure-wsus.ps1
-- name: Restart Machine
+# Joins a server to the domain
+
+- name: Join domain script
+  script: "../../../ps-scripts/client-djoin.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
+  ignore_errors: yes
+- name: Restart Machine 
   script: ../../../ps-scripts/restart.ps1
   ignore_errors: yes
 - name: waiting for server to come back

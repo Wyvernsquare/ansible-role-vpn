@@ -1,0 +1,22 @@
+---
+
+- name: install strongswan-plugin-kernel-libipsec
+  yum: name=strongswan-plugin-kernel-libipsec state=present
+  notify: 
+    - restart ipsec
+
+- name: ensure strongswan build-dep
+  yum: name=strongswan state=build-dep
+
+- name: download strongswan source
+  command: /usr/bin/apt-get source strongswan 
+           chdir=/usr/src
+           creates=/usr/src/strongswan-5.1.2
+
+- name: build and install strongswan kernel-libipsec.so
+  shell: ./configure --enable-kernel-libipsec && make 
+         && cp src/libcharon/plugins/kernel_libipsec/.libs/libstrongswan-kernel-libipsec.so /usr/lib/ipsec/plugins/
+         chdir=/usr/src/strongswan-5.1.2
+         creates=/usr/lib/ipsec/plugins/libstrongswan-kernel-libipsec.so
+  notify: 
+    - restart ipsec

@@ -1,22 +1,21 @@
 ---
+- hosts: mgmt1,vpn1
+  sudo: yes
+  user: vagrant 
+  roles:
+   - linuxcommon
 - hosts: dc1
-  vars:
-    username: Administrator
-    password: vagrant
-    domain: "reallyenglish.local"
   roles: 
+   - intnet
    - rdc
+   - intnet
 - hosts: dc2
-  vars:
-    username: Administrator
-    password: vagrant
-    domain: "reallyenglish.local"
   roles: 
+   - intnet
+   - indomain
    - dc
 - hosts: wsus
-  vars:
-    username: Administrator
-    password: vagrant
-    domain: "reallyenglish.local"
   roles: 
+   - intnet
+   - indomain
    - wsus
