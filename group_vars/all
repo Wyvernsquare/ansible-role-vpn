@@ -1,0 +1,6 @@
+username: Administrator
+password: vagrant
+domain: reallyenglish.local
+gw: 10.0.81.1
+dns: 10.0.81.12
+netmask: 24

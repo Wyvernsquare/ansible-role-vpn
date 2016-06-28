@@ -1,0 +1,6 @@
+---
+- name: restart xl2tpd
+  action: service name=xl2tpd state=restarted
+
+- name: restart ipsec
+  action: service name=strongswan state=restarted

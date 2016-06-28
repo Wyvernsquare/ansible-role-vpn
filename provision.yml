@@ -4,16 +4,27 @@
   user: vagrant 
   roles:
    - linuxcommon
+
+- hosts: vpn1
+  sudo: yes
+  user: vagrant
+  roles:
+   - strongswan
+   - role: l2tp
+     when: ipsec_enable_l2tp
+   - nat
+
 - hosts: dc1
-  roles: 
-   - intnet
+  roles:
    - rdc
    - intnet
+
 - hosts: dc2
   roles: 
    - intnet
    - indomain
    - dc
+
 - hosts: wsus
   roles: 
    - intnet

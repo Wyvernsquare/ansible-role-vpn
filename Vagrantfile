@@ -2,6 +2,15 @@
 # vi: set ft=ruby :
 VAGRANTFILE_API_VERSION = "2"
 
+# Checks ENV VAGRANT_DOTFILE_PATH. Set to current directory .vagrant if NULL
+VAGRANT_DOTFILE_PATH = ENV['VAGRANT_DOTFILE_PATH'];
+currpath = ENV['VAGRANT_DOTFILE_PATH'];
+if(currpath.nil?)
+    currpath = '.vagrant';
+    ENV['VAGRANT_DOTFILE_PATH'] = currpath;
+end
+
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -14,19 +23,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Windows Servers starting from position number Nth
   winsrvN = 3
   # Network Settings
-  nwadr = "10.0.1"
+  nwadr = "10.0.81"
   lastoctet_initadr = 10
-  masklength = 16
-  dns = "10.0.1.12"
+  masklength = 24
+  netmsk = "255.255.255.0"
+  dns = "10.0.81.12"
   # Windows Server Settings
   username = "Administrator"
   password = "vagrant"
   domain = "reallyenglish.local"
 
+  # Linux Server Settings
+  linusr = "vagrant"
 
-  # Open file writing pipe for ansible inventory file
+
+  # Open file writing pipe for ansible inventory and global variable files
   require "fileutils"
-  f = File.open("hosts","w")
   allvars = File.open("group_vars/all", "w")
   allvars.puts "username: #{username}"
   allvars.puts "password: #{password}"
@@ -34,6 +46,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   allvars.puts "gw: #{nwadr}.1"
   allvars.puts "dns: #{dns}"
   allvars.puts "netmask: #{masklength}"
+  allvars.close
+
+  f = File.open("hosts","w")
 
   # VM variables
   VAGRANT_VM_PROVIDER = "virtualbox"
@@ -42,21 +57,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server#{machine_id}/#{VAGRANT_VM_PROVIDER}/private_key"
   end
 
-  # Set-up Management Machine
-  config.vm.box = "centos/7"
-  config.vm.hostname = "mgmt1"
-  config.vm.define "server1"
-  config.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr}", netmask: "255.255.0.0"
-  f.puts "[mgmt1]"
-  f.puts "#{nwadr}.#{lastoctet_initadr}"
-  
-  # Set up VPN Server
-  config.vm.box = "centos/7"
-  config.vm.hostname = "vpn1"
-  config.vm.define "server2"
-  config.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr+1}", netmask: "255.255.0.0"
-  f.puts "[vpn1]"
-  f.puts "#{nwadr}.#{lastoctet_initadr+1}"
+  # Set up Linux Servers
+  (1..winsrvN-1).each do |svr_id|
+    config.vm.define "server#{svr_id}" do |server|
+      server.vm.box = "centos/7"
+      server.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr+svr_id-1}", netmask: "#{netmsk}"
+
+      # Set-up Management Machine and VPN Server
+      if svr_id == 1
+        server.vm.hostname = "mgmt1"
+        f.puts "[mgmt1]"
+      end
+      if svr_id == 2
+        server.vm.hostname = "vpn1"
+        f.puts "[vpn1]"
+        server.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+      end
+    f.puts "#{nwadr}.#{lastoctet_initadr+svr_id-1} ansible_ssh_user=#{linusr} ansible_ssh_private_key_file=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server#{svr_id}/#{VAGRANT_VM_PROVIDER}/private_key" 
+    end
+  end
 
   # Set up Windows Servers
   i = 1
@@ -71,20 +90,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Port forward WinRM and RDP (changed values to NOT conflict with host)
     machine.vm.network "forwarded_port", host: 33389, guest: 3389, id: "rdp", auto_correct: true
     machine.vm.network "forwarded_port", host: 5987, guest: 5985, id: "winrm", auto_correct: true
-	 if machine_id  < N && machine_id > 1
+	 if machine_id  < N && machine_id > 0
 	     machine.vm.hostname = "dc#{i}"
        f.puts "[dc#{i}]"
        f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
-       if i == 1 
-        allvars.puts "dns: #{nwadr}.#{lastoctet_initadr-1+machine_id}"
-       end
 	 end
 	 if machine_id == N
 	     machine.vm.hostname = "wsus"
        f.puts "[wsus]"
        f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
 	 end
-     machine.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr-1+machine_id}", netmask: "255.255.0.0"
+     machine.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr-1+machine_id}", netmask: "#{netmsk}"
   
      # Create a forwarded port mapping which allows access to a specific port
      # within the machine from a port on the host machine. In the example below,
@@ -104,7 +120,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
            ansible.limit = "all"
            ansible.playbook = "provision.yml"
            ansible.inventory_path = "hosts"
-           ansible.verbose = "-v"
+           #ansible.verbose = "-v"
            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
 		    end
         
@@ -126,7 +142,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        # close inventory file writing pipe
        f.close
        # close group variable file writing pipe
-       allvars.close
        end
 
 

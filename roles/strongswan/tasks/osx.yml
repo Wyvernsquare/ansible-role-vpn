@@ -7,7 +7,7 @@
     - osx
 
 - name: cp server cert to web server for importing to osx
-  shell: cp /etc/ipsec.d/certs/server_cert.pem /var/www/ikev2/osx/
+  shell: cp /etc/strongswan/ipsec.d/certs/server_cert.pem /var/www/ikev2/osx/
   tags:
     - ipsec
     - osx

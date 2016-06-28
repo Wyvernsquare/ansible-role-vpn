@@ -2,10 +2,15 @@
 #install common packages
 
 - name: update yum cache
-  action: yum update_cache=yes cache_valid_time=3600
+  yum: name=* update_cache=yes
   tags:
     - common
     - update
+
+- name: install epel extra
+  action: yum name=epel-release state=installed
+  tags:
+   - common
 
 - name: install editor
   action: yum pkg={{ item }} state=installed
@@ -31,7 +36,7 @@
   with_items:
     - python-setuptools
     - python-pip
-    - python-dev
+    - python-devel
     - python-pycurl
   tags:
     - common

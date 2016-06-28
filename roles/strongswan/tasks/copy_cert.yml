@@ -26,7 +26,7 @@
     - ca
 
 - name: upload certs to server 
-  template: src=anything.txt dest=/etc/ipsec.d/{{ item.path }}
+  template: src=anything.txt dest=/etc/strongswan/ipsec.d/{{ item.path }}
   with_items:
     - path: cacerts/ca_cert.pem
       content: "{{ ca_cert_content_action.stdout }}"

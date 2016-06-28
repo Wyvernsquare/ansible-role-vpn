@@ -1,25 +1,46 @@
 ---
 #install & config ikev2 server
 
+- name: Install EPEL with strongswan
+  yum: pkg="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm" state=installed
+
 - name: Enforce strongswan is installed
   yum: pkg={{ item }} state=installed
   with_items:
     - strongswan
-    - strongswan-plugin-xauth-generic
-    - strongswan-plugin-xauth-eap
-    - strongswan-plugin-eap-md5
-    - strongswan-plugin-eap-mschapv2
-    - strongswan-plugin-eap-radius
+    - xl2tpd
+    - lsof
+    - openssl
   notify: restart ipsec
   tags:
     - ipsec
 
+- name: Link strongswan to ipsec shell
+  sudo: yes
+  command: ln -s -f /usr/sbin/strongswan /usr/sbin/ipsec
+  tags:
+   - ipsec
+
 - include: openvz.yml
   when: ansible_virtualization_role == "guest" and ansible_virtualization_type == "openvz"
 
+- name: make sure /etc/ipsec.d/private exists
+  action: file path=/etc/ipsec.d/private/ state=directory
+  tags:
+    - ipsec
+- name: make sure /etc/ipsec.d/cacerts exists
+  action: file path=/etc/ipsec.d/cacerts/ state=directory 
+  tags:
+    - ipsec
+- name: make sure /etc/ipsec.d/certs exists
+  action: file path=/etc/ipsec.d/certs/ state=directory
+  tags:
+    - ipsec
+
 - name:  Upload IPSec config files
+  sudo: yes
   template: src={{ item }}
-            dest=/etc/{{ item }}
+            dest=/etc/strongswan/{{ item }}
             owner=root group=root mode=0644
   with_items:
     - ipsec.conf
@@ -33,9 +54,11 @@
   when: ipsec_enable_ikev2 and ipsec_cert_source == "gen"
 
 - include: upload_cert.yml
+  sudo: yes
   when: ipsec_enable_ikev2 and (ipsec_cert_source == "local" or ipsec_cert_source == "upload")
 
 - include: sync_cert.yml
+  sudo: yes
   when: ipsec_enable_ikev2 and ipsec_cert_source == "remote"
 
 #- include: copy_cert.yml
