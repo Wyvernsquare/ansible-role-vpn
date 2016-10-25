@@ -1,2 +1,2 @@
 - name: Configure Internal Network settings
-  script: ../../../ps-scripts/Set-IntnetSettings.ps1
+  script: "../../../ps-scripts/Set-IntnetSettings.ps1 -gw {{ gw }} -dns {{ dns }} -netmask {{ netmask }}"

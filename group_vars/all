@@ -1,6 +1,9 @@
 username: Administrator
 password: vagrant
-domain: reallyenglish.local
+domain: restaging.com
 gw: 10.0.81.1
 dns: 10.0.81.12
-netmask: 24
+masklength: 24
+netmask: 255.255.255.0
+svrstart: 10.0.81.100
+svrend: 10.0.81.254

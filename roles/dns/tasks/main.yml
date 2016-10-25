@@ -1,0 +1,2 @@
+- name: Configure DNS Server Role
+  script: "../../../ps-scripts/Configure-DNSServer.ps1 -gw {{ gw }} -dns {{ dns }} -netmask {{ netmask }} -masklength {{ masklength }} -domain {{ domain }}"

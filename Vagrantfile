@@ -27,11 +27,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   lastoctet_initadr = 10
   masklength = 24
   netmsk = "255.255.255.0"
+  svrstartip = "10.0.81.100"
+  svrendip = "10.0.81.254"
   dns = "10.0.81.12"
   # Windows Server Settings
   username = "Administrator"
   password = "vagrant"
-  domain = "reallyenglish.local"
+  domain = "restaging.com"
 
   # Linux Server Settings
   linusr = "vagrant"
@@ -45,7 +47,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   allvars.puts "domain: #{domain}"
   allvars.puts "gw: #{nwadr}.1"
   allvars.puts "dns: #{dns}"
-  allvars.puts "netmask: #{masklength}"
+  allvars.puts "masklength: #{masklength}"
+  allvars.puts "netmask: #{netmsk}"
+  allvars.puts "svrstart: #{svrstartip}"
+  allvars.puts "svrend: #{svrendip}"
   allvars.close
 
   f = File.open("hosts","w")

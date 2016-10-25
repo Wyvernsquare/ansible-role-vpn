@@ -36,6 +36,8 @@ Install-ADDSForest `
 
 # Really ensure that DNS Server is installed
 Install-WindowsFeature "DNS" -IncludeManagementTools
+# Install DHCP on RDC
+Install-WindowsFeature "DHCP" -IncludeManagementTools
 
 #Disable NLA otherwise RDP stops working
 (Get-WmiObject -class "Win32_TSGeneralSetting" -Namespace root\cimv2\terminalservices -Filter "TerminalName='RDP-tcp'").SetUserAuthenticationRequired(0)
