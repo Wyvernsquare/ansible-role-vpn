@@ -1,6 +1,13 @@
 ---
 # Creates Forest and Domain, and set as Primary Domain Controller 
 
+- name: Install Domain Controller Role
+  win_feature:
+    name: "AD-Domain-Services"
+    state: present
+    restart: yes
+    include_sub_feature: yes
+    include_management_tools: yes
 - name: Create New Forest and Domain Controller
   script: "../../../ps-scripts/Create-NewDomain.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
   ignore_errors: yes

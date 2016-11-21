@@ -8,7 +8,6 @@ $EndRange=$svrend
 $Subnet=$netmask
 $Router=$gw
  
-Install-WindowsFeature -Name 'DHCP' -IncludeManagementTools
 cmd.exe /c "netsh dhcp add securitygroups"
 Restart-service dhcpserver
 Add-DhcpServerInDC -DnsName $Env:COMPUTERNAME

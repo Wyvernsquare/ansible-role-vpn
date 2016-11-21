@@ -16,8 +16,10 @@
 
 - hosts: dc1
   roles:
+   - intnet
    - rdc
    - intnet
+   - dns
    - dhcp
 
 - hosts: dc2
