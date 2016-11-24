@@ -11,6 +11,7 @@
   roles: 
    - intnet
    - indomain
+   - intnet
    - dc
 
 - hosts: wsus

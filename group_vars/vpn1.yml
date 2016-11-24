@@ -1,8 +1,8 @@
-ipsec_enable_ikev1: false 
+ipsec_enable_ikev1: false
 ipsec_enable_ikev2: false
 ipsec_enable_l2tp: true
-ipsec_psk: ipsecworks
+ipsec_psk: reallyenglishvpn
 ipsec_use_radius: false
 l2tp_users:
-  - username: "testuser"
-    password: "changeme"
+  - username: "vpnuser"
+    password: "opensesame"

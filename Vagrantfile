@@ -38,6 +38,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Linux Server Settings
   linusr = "vagrant"
 
+  # VPN Connection Settings
+  enable_ikev1 = "false"
+  enable_ikev2 = "false"
+  enable_l2tp = "true"
+  psk_secret = "reallyenglishvpn"
+  enable_radius = "false"
+  vpnusername = "vpnuser"
+  vpnpassword = "opensesame"
+
 
   # Open file writing pipe for ansible inventory and global variable files
   require "fileutils"
@@ -52,6 +61,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   allvars.puts "svrstart: #{svrstartip}"
   allvars.puts "svrend: #{svrendip}"
   allvars.close
+
+  # Write to vpn1 variable file
+  vpnfile = File.open("group_vars/vpn1.yml", "w")
+  vpnfile.puts "ipsec_enable_ikev1: #{enable_ikev1}"
+  vpnfile.puts "ipsec_enable_ikev2: #{enable_ikev2}"
+  vpnfile.puts "ipsec_enable_l2tp: #{enable_l2tp}"
+  vpnfile.puts "ipsec_psk: #{psk_secret}"
+  vpnfile.puts "ipsec_use_radius: #{enable_radius}"
+  vpnfile.puts "l2tp_users:"
+  vpnfile.puts "  - username: \"#{vpnusername}\""
+  vpnfile.puts "    password: \"#{vpnpassword}\""
+  vpnfile.close
+
+
 
   f = File.open("hosts","w")
 
