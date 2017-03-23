@@ -117,6 +117,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   (winsrvN..N).each do |machine_id|
   config.vm.define "server#{machine_id}" do |machine|
     machine.vm.box = "mwrock/Windows2012R2"
+    machine.vm.box_version = "0.3.0"
     machine.vm.guest = :windows
     # Set-up WinRM and RDP for Windows Machines
     machine.vm.communicator = "winrm"
