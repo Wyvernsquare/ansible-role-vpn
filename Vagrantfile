@@ -19,7 +19,7 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Number of total servers
-  N = 5
+  N = 4
   # Windows Servers starting from position number Nth
   winsrvN = 3
   # Network Settings
@@ -33,7 +33,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Windows Server Settings
   username = "Administrator"
   password = "vagrant"
-  domain = "reallyenglish.local"
+  vagrantusr = "vagrant"
+
+  domain = "restaging.com"
+  usradm = "supachots"
+  uadmpw = "Vagr@nt1"
 
   # Linux Server Settings
   linusr = "vagrant"
@@ -51,15 +55,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Open file writing pipe for ansible inventory and global variable files
   require "fileutils"
   allvars = File.open("group_vars/all", "w")
+
+  # DO NOT CHANGE THESE VALUES
   allvars.puts "username: #{username}"
   allvars.puts "password: #{password}"
+  allvars.puts "vagrantusr: #{vagrantusr}"
   allvars.puts "domain: #{domain}"
-  allvars.puts "gw: #{nwadr}.1"
+  allvars.puts "gw: #{dns}"
   allvars.puts "dns: #{dns}"
   allvars.puts "masklength: #{masklength}"
   allvars.puts "netmask: #{netmsk}"
   allvars.puts "svrstart: #{svrstartip}"
   allvars.puts "svrend: #{svrendip}"
+  allvars.puts "usradm: #{usradm}"
+  allvars.puts "uadmpw: #{uadmpw}"
   allvars.close
 
   # Write to vpn1 variable file
@@ -73,8 +82,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vpnfile.puts "  - username: \"#{vpnusername}\""
   vpnfile.puts "    password: \"#{vpnpassword}\""
   vpnfile.close
-
-
 
   f = File.open("hosts","w")
 
@@ -109,7 +116,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   i = 1
   (winsrvN..N).each do |machine_id|
   config.vm.define "server#{machine_id}" do |machine|
-    machine.vm.box = "kensykora/windows_2012_r2_standard"
+    machine.vm.box = "mwrock/Windows2012R2"
     machine.vm.guest = :windows
     # Set-up WinRM and RDP for Windows Machines
     machine.vm.communicator = "winrm"
@@ -118,12 +125,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Port forward WinRM and RDP (changed values to NOT conflict with host)
     machine.vm.network "forwarded_port", host: 33389, guest: 3389, id: "rdp", auto_correct: true
     machine.vm.network "forwarded_port", host: 5987, guest: 5985, id: "winrm", auto_correct: true
-	 if machine_id  < N && machine_id > 0
+	 if machine_id  <= N && machine_id > 0
 	     machine.vm.hostname = "dc#{i}"
        f.puts "[dc#{i}]"
        f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
 	 end
-	 if machine_id == N
+	 if machine_id == N+1
 	     machine.vm.hostname = "wsus"
        f.puts "[wsus]"
        f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
@@ -159,7 +166,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             f.puts "dc#{num-winsrvN+1}"
           end
         end
-        f.puts "wsus"
+        f.puts "dc2"
         f.puts "[allservers:vars]"
         f.puts "ansible_ssh_user=Administrator"
         f.puts "ansible_ssh_pass=vagrant"

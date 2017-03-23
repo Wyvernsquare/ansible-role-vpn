@@ -14,4 +14,14 @@
 - name: Restart Machine 
   script: ../../../ps-scripts/restart.ps1
   ignore_errors: yes
-- pause: minutes=7
+- name: waiting for server to come back
+  local_action:
+    module: wait_for
+    host: "{{ inventory_hostname }}"
+    port: 5985
+    delay: 10
+    timeout: 500
+    state: started
+
+- include: resolvepw.yml
+

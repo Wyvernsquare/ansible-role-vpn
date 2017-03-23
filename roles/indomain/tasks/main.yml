@@ -1,7 +1,7 @@
 # Joins a server to the domain
 
 - name: Join domain script
-  script: "../../../ps-scripts/client-djoin.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
+  script: "../../../ps-scripts/client-djoin.ps1 -u {{ vagrantusr }} -p {{ password }} -d {{ domain }}"
   ignore_errors: yes
 - name: Restart Machine 
   script: ../../../ps-scripts/restart.ps1
