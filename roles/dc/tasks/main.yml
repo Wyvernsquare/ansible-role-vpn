@@ -2,11 +2,10 @@
 # Promotes server to Domain Controller
 
 - name: Promote to Domain Controller
-  script: "../../../ps-scripts/Promote-DC.ps1 -u {{ vagrantusr }} -p {{ password }} -d {{ domain }}"
+  script: "../../../ps-scripts/Promote-DC.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
   ignore_errors: yes
-- name: Restart Machine 
-  script: ../../../ps-scripts/restart.ps1
-  ignore_errors: yes
+- name: Restart Machine
+  win_reboot:
 - name: waiting for server to come back
   local_action:
     module: wait_for

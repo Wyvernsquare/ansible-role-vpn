@@ -23,8 +23,8 @@ ipsec_radius_servers:
     secret: some-radius-secret
 
 ipsec_dns_servers:
+   - "{{ dns }}"
    - 8.8.8.8
-   - 8.8.4.4
 
 ipsec_psk: ipsecworks
 ipsec_cert_source: "gen" #upload, local, remote

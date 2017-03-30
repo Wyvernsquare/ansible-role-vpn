@@ -81,6 +81,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vpnfile.puts "l2tp_users:"
   vpnfile.puts "  - username: \"#{vpnusername}\""
   vpnfile.puts "    password: \"#{vpnpassword}\""
+  vpnfile.puts "l2tp_dns_servers:"
+  vpnfile.puts "  - \"#{dns}\""
+  vpnfile.puts "  - 8.8.8.8"
+  vpnfile.puts "ipsec_dns_servers:"
+  vpnfile.puts "  - \"#{dns}\""
+  vpnfile.puts "  - 8.8.8.8"
   vpnfile.close
 
   f = File.open("hosts","w")
@@ -117,7 +123,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   (winsrvN..N).each do |machine_id|
   config.vm.define "server#{machine_id}" do |machine|
     machine.vm.box = "mwrock/Windows2012R2"
-    machine.vm.box_version = "0.3.0"
     machine.vm.guest = :windows
     # Set-up WinRM and RDP for Windows Machines
     machine.vm.communicator = "winrm"
@@ -189,4 +194,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
 end

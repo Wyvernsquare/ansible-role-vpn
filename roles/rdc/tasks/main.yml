@@ -12,8 +12,7 @@
   script: "../../../ps-scripts/Create-NewDomain.ps1 -u {{ username }} -p {{ password }} -d {{ domain }}"
   ignore_errors: yes
 - name: Restart Machine 
-  script: ../../../ps-scripts/restart.ps1
-  ignore_errors: yes
+  win_reboot:
 - name: waiting for server to come back
   local_action:
     module: wait_for

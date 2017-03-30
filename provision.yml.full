@@ -20,14 +20,10 @@
    - rdc
    - intnet
    - dns
+   - dhcp
 
 - hosts: dc2
   roles: 
    - intnet
    - indomain
    - dc
-
-- hosts: wsus
-  roles: 
-   - intnet
-   - indomain

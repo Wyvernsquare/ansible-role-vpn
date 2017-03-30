@@ -3,8 +3,7 @@
 - name: Install and Configure WSUS
   script: ../../../ps-scripts/configure-wsus.ps1
 - name: Restart Machine
-  script: ../../../ps-scripts/restart.ps1
-  ignore_errors: yes
+  win_reboot:
 - name: waiting for server to come back
   local_action:
     module: wait_for

@@ -1,1 +1,1 @@
-Restart-Computer -ComputerName localhost -Force
+Restart-Computer -Force

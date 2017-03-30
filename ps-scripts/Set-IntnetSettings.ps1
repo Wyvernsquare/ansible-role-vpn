@@ -18,3 +18,6 @@ Set-DNSClientServerAddress -InterfaceAlias $alias -ServerAddresses $dns
 
 #Set-DNSClientServerAddress -InterfaceAlias $alias -ServerAddresses 192.168.1.11
 # Set-DNSClientServerAddress -InterfaceAlias $alias -ServerAddresses ("$ipv4dns1","$ipv4dns2") #use this for two dns servers
+
+# Disable IPv6
+Disable-NetAdapterBinding -InterfaceAlias $alias -ComponentID ms_tcpip6

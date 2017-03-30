@@ -6,3 +6,9 @@ ipsec_use_radius: false
 l2tp_users:
   - username: "vpnuser"
     password: "opensesame"
+l2tp_dns_servers:
+  - "10.0.81.12"
+  - 8.8.8.8
+ipsec_dns_servers:
+  - "10.0.81.12"
+  - 8.8.8.8

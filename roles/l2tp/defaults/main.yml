@@ -7,8 +7,8 @@ l2tp_network:
   subnet: 10.0.7.0/24
 
 l2tp_dns_servers:
+  - "{{ dns }}"
   - 8.8.8.8
-  - 8.8.4.4
 
 l2tp_mtu: 1340
 
