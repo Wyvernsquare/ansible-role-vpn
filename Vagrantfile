@@ -67,8 +67,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vpnfile = File.open("group_vars/vpn1.yml", "w")
   vpnfile.puts "---"
   vpnfile.puts "radius_servers:"
-  vpnfile.puts "  - host: #{vpnradius_host}"
-  vpnfile.puts "  - secret: #{psk_secret}"
+  vpnfile.puts "  host: #{vpnradius_host}"
+  vpnfile.puts "  secret: #{psk_secret}"
   vpnfile.puts "dns_servers:"
   vpnfile.puts "  - #{dns1}"
   vpnfile.puts "  - #{dns2}"
@@ -81,8 +81,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vpnfile.puts "ipsec_dns_servers: \"\{\{ dns_servers \}\}\""
   #vpnfile.puts "ipsec_radius_servers: \"\{\{ radius_servers \}\}\""
   vpnfile.puts "ipsec_radius_servers:"
-  vpnfile.puts "  - host: #{vpnradius_host}"
-  vpnfile.puts "  - secret: #{psk_secret}"
+  vpnfile.puts "  host: #{vpnradius_host}"
+  vpnfile.puts "  secret: #{psk_secret}"
 
   vpnfile.puts "l2tp_server_name: \"#{vpnserver_name}\""
   vpnfile.puts "l2tp_network:"
@@ -93,8 +93,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vpnfile.puts "l2tp_use_radius: #{enable_radius}"
   #vpnfile.puts "l2tp_radius_servers: \"\{\{ radius_servers \}\}\""
   vpnfile.puts "l2tp_radius_servers:"
-  vpnfile.puts "  - host: #{vpnradius_host}"
-  vpnfile.puts "  - secret: #{psk_secret}"
+  vpnfile.puts "  host: #{vpnradius_host}"
+  vpnfile.puts "  secret: #{psk_secret}"
   vpnfile.puts "l2tp_enable_nat: #{l2tp_enable_nat}"
   vpnfile.puts "l2tp_under_ipsec: #{l2tp_under_ipsec}"
 
@@ -107,8 +107,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vpnfile.puts "pptp_use_radius: #{enable_radius}"
   #vpnfile.puts "pptp_radius_servers: \"\{\{ radius_servers \}\}\""
   vpnfile.puts "pptp_radius_servers:"
-  vpnfile.puts "  - host: #{vpnradius_host}"
-  vpnfile.puts "  - secret: #{psk_secret}"
+  vpnfile.puts "  host: #{vpnradius_host}"
+  vpnfile.puts "  secret: #{psk_secret}"
 
   #vpnfile.puts "l2tp_users:"
   #vpnfile.puts "  - username: \"#{vpnusername}\""

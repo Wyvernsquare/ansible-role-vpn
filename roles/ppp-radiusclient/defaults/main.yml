@@ -1,5 +1,6 @@
 ---
 radius_servers:
-  - host: 127.0.0.1
-    secret: some-radius-secret
-    auth_port: 1645
+  host: 127.0.0.1
+  secret: some-radius-secret
+  auth_port: 1645
+  acct_port: 1646

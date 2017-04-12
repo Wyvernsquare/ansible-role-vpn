@@ -5,19 +5,10 @@
   user: vagrant
   roles:
     - role: ppp-radiusclient
-      when: pptp_use_radius
-      radius_servers: "{{pptp_radius_servers}}"
       device_type: pptp
-
-    - strongswan
-
-    - role: l2tp
-      when: ipsec_enable_l2tp
-
     - role: ppp-radiusclient
-      when: ipsec_enable_l2tp and l2tp_use_radius
       device_type: l2tp
-      radius_servers: "{{radius_servers}}"
-
+    - strongswan
+    - l2tp
     - nat
 
