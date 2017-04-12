@@ -1,9 +1,0 @@
-- name: Install DNS Server Role
-  win_feature:
-    name: "DNS"
-    state: present
-    restart: yes
-    include_sub_feature: yes
-    include_management_tools: yes
-- name: Configure DNS Server Role
-  script: "../../../ps-scripts/Configure-DNSServer.ps1 -gw {{ gw }} -dns {{ dns }} -netmask {{ netmask }} -masklength {{ masklength }} -domain {{ domain }}"

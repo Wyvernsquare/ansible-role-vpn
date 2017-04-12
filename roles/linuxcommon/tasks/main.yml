@@ -2,18 +2,18 @@
 #install common packages
 
 - name: update yum cache
-  yum: name=* update_cache=yes
+  package: name=* update_cache=yes
   tags:
     - common
     - update
 
 - name: install epel extra
-  action: yum name=epel-release state=installed
+  package: name=epel-release state=latest
   tags:
    - common
 
 - name: install editor
-  action: yum pkg={{ item }} state=installed
+  package: name={{ item }} state=latest
   with_items:
     - vim
   tags:
@@ -21,10 +21,10 @@
     - editor
 
 - name: install net-tools
-  yum: name=net-tools state=installed
+  package: name=net-tools state=latest
 
 - name: install version control tools
-  action: yum pkg={{ item }} state=installed
+  package: name={{ item }} state=latest
   with_items:
     - git
   tags:
@@ -32,7 +32,7 @@
     - vcs
 
 - name: install common python packages
-  action: yum pkg={{ item }} state=installed
+  package: name={{ item }} state=latest
   with_items:
     - python-setuptools
     - python-pip
@@ -44,7 +44,7 @@
 
 
 - name: install supervisor
-  action: yum pkg={{ item }} state=installed
+  package: name={{ item }} state=latest
   with_items:
     - supervisor
   tags:

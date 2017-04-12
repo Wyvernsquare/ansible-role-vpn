@@ -1,9 +1,0 @@
-- name: Install DHCP Server Role
-  win_feature:
-    name: "DHCP"
-    state: present
-    restart: yes
-    include_sub_feature: yes
-    include_management_tools: yes
-- name: Configure DHCP Server Role
-  script: "../../../ps-scripts/Configure-DHCPServer.ps1 -gw {{ gw }} -dns {{ dns }} -netmask {{ netmask }} -masklength {{ masklength }} -svrstart {{ svrstart }} -svrend {{ svrend }} -domain {{ domain }}"

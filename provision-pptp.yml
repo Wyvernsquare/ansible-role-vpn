@@ -1,0 +1,13 @@
+#see group_vars/vpn.yml.example for configuration options
+---
+- hosts: vpn1
+  sudo: yes
+  user: vagrant
+  roles:
+    - linuxcommon
+    - pptp
+    - role: ppp-radiusclient
+      device_type: pptp
+    - strongswan
+    - nat
+

@@ -1,12 +1,5 @@
-username: Administrator
-password: vagrant
-vagrantusr: vagrant
-domain: restaging.com
-gw: 10.0.81.12
-dns: 10.0.81.12
+domain: internal.wyvernsquare.com
+gw: 172.31.30.104
+dns: 172.31.30.104
 masklength: 24
-netmask: 255.255.255.0
-svrstart: 10.0.81.100
-svrend: 10.0.81.254
-usradm: supachots
-uadmpw: Vagr@nt1
+netmask: 255.255.240.0

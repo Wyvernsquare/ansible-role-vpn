@@ -18,27 +18,15 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # Number of total servers
-  N = 4
-  # Windows Servers starting from position number Nth
-  winsrvN = 3
   # Network Settings
-  nwadr = "10.0.81"
-  lastoctet_initadr = 10
+  svradr = "172.31.16.100"
+  nwadr = "172.31.16"
   masklength = 24
-  netmsk = "255.255.255.0"
-  svrstartip = "10.0.81.100"
-  svrendip = "10.0.81.254"
-  dns = "10.0.81.12"
-  # Windows Server Settings
-  username = "Administrator"
-  password = "vagrant"
-  vagrantusr = "vagrant"
-
-  domain = "restaging.com"
-  usradm = "supachots"
-  uadmpw = "Vagr@nt1"
-
+  netmsk = "255.255.240.0"
+  dns = "172.31.30.104"
+  dns1 = #{dns}
+  dns2 = "8.8.8.8"
+  domain = "internal.wyvernsquare.com"
   # Linux Server Settings
   linusr = "vagrant"
 
@@ -46,47 +34,85 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   enable_ikev1 = "false"
   enable_ikev2 = "false"
   enable_l2tp = "true"
-  psk_secret = "reallyenglishvpn"
-  enable_radius = "false"
-  vpnusername = "vpnuser"
-  vpnpassword = "opensesame"
+  psk_secret = "wyvernsquarebeerpizzaandfriends"
+  enable_radius = "true"
+  #vpnusername = "vpnuser"
+  #vpnpassword = "opensesame"
 
+  # VPN/RADIUS Host Settings
+  vpnserver_name = "Wyvernsquare Staging"
+  vpnlocal_ip = "172.31.27.1"
+  vpnremote_ip = "172.31.27.10-249"
+  vpnsubnet = "172.31.27.0/24"
+  vpnradius_host = "52.192.214.252"
+  l2tp_enable_nat = "true"
+  l2tp_under_ipsec = "true"
+  
 
   # Open file writing pipe for ansible inventory and global variable files
   require "fileutils"
   allvars = File.open("group_vars/all", "w")
 
   # DO NOT CHANGE THESE VALUES
-  allvars.puts "username: #{username}"
-  allvars.puts "password: #{password}"
-  allvars.puts "vagrantusr: #{vagrantusr}"
+  #allvars.puts "username: #{username}"
+  #allvars.puts "password: #{password}"
   allvars.puts "domain: #{domain}"
   allvars.puts "gw: #{dns}"
   allvars.puts "dns: #{dns}"
   allvars.puts "masklength: #{masklength}"
   allvars.puts "netmask: #{netmsk}"
-  allvars.puts "svrstart: #{svrstartip}"
-  allvars.puts "svrend: #{svrendip}"
-  allvars.puts "usradm: #{usradm}"
-  allvars.puts "uadmpw: #{uadmpw}"
   allvars.close
 
   # Write to vpn1 variable file
   vpnfile = File.open("group_vars/vpn1.yml", "w")
+  vpnfile.puts "---"
+  vpnfile.puts "radius_servers:"
+  vpnfile.puts "  - host: #{vpnradius_host}"
+  vpnfile.puts "  - secret: #{psk_secret}"
+  vpnfile.puts "dns_servers:"
+  vpnfile.puts "  - #{dns1}"
+  vpnfile.puts "  - #{dns2}"
+  
   vpnfile.puts "ipsec_enable_ikev1: #{enable_ikev1}"
   vpnfile.puts "ipsec_enable_ikev2: #{enable_ikev2}"
   vpnfile.puts "ipsec_enable_l2tp: #{enable_l2tp}"
   vpnfile.puts "ipsec_psk: #{psk_secret}"
   vpnfile.puts "ipsec_use_radius: #{enable_radius}"
-  vpnfile.puts "l2tp_users:"
-  vpnfile.puts "  - username: \"#{vpnusername}\""
-  vpnfile.puts "    password: \"#{vpnpassword}\""
-  vpnfile.puts "l2tp_dns_servers:"
-  vpnfile.puts "  - \"#{dns}\""
-  vpnfile.puts "  - 8.8.8.8"
-  vpnfile.puts "ipsec_dns_servers:"
-  vpnfile.puts "  - \"#{dns}\""
-  vpnfile.puts "  - 8.8.8.8"
+  vpnfile.puts "ipsec_dns_servers: \"\{\{ dns_servers \}\}\""
+  #vpnfile.puts "ipsec_radius_servers: \"\{\{ radius_servers \}\}\""
+  vpnfile.puts "ipsec_radius_servers:"
+  vpnfile.puts "  - host: #{vpnradius_host}"
+  vpnfile.puts "  - secret: #{psk_secret}"
+
+  vpnfile.puts "l2tp_server_name: \"#{vpnserver_name}\""
+  vpnfile.puts "l2tp_network:"
+  vpnfile.puts "  local_ip: #{vpnlocal_ip}"
+  vpnfile.puts "  remote_ip: #{vpnremote_ip}"
+  vpnfile.puts "  subnet: #{vpnsubnet}"
+  vpnfile.puts "l2tp_dns_servers: \"\{\{ dns_servers \}\}\""
+  vpnfile.puts "l2tp_use_radius: #{enable_radius}"
+  #vpnfile.puts "l2tp_radius_servers: \"\{\{ radius_servers \}\}\""
+  vpnfile.puts "l2tp_radius_servers:"
+  vpnfile.puts "  - host: #{vpnradius_host}"
+  vpnfile.puts "  - secret: #{psk_secret}"
+  vpnfile.puts "l2tp_enable_nat: #{l2tp_enable_nat}"
+  vpnfile.puts "l2tp_under_ipsec: #{l2tp_under_ipsec}"
+
+  vpnfile.puts "pptp_server_name: \"#{vpnserver_name}\""
+  vpnfile.puts "pptp_network:"
+  vpnfile.puts "  local_ip: #{vpnlocal_ip}"
+  vpnfile.puts "  remote_ip: #{vpnremote_ip}"
+  vpnfile.puts "  subnet: #{vpnsubnet}"
+  vpnfile.puts "pptp_dns_servers: \"\{\{ dns_servers \}\}\""
+  vpnfile.puts "pptp_use_radius: #{enable_radius}"
+  #vpnfile.puts "pptp_radius_servers: \"\{\{ radius_servers \}\}\""
+  vpnfile.puts "pptp_radius_servers:"
+  vpnfile.puts "  - host: #{vpnradius_host}"
+  vpnfile.puts "  - secret: #{psk_secret}"
+
+  #vpnfile.puts "l2tp_users:"
+  #vpnfile.puts "  - username: \"#{vpnusername}\""
+  #vpnfile.puts "    password: \"#{vpnpassword}\""
   vpnfile.close
 
   f = File.open("hosts","w")
@@ -94,101 +120,31 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # VM variables
   VAGRANT_VM_PROVIDER = "virtualbox"
   ANSIBLE_RAW_SSH_ARGS = []
-  (1..N-1).each do |machine_id|
-    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server#{machine_id}/#{VAGRANT_VM_PROVIDER}/private_key"
-  end
+  ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server1/#{VAGRANT_VM_PROVIDER}/private_key"
 
   # Set up Linux Servers
-  (1..winsrvN-1).each do |svr_id|
-    config.vm.define "server#{svr_id}" do |server|
-      server.vm.box = "centos/7"
-      server.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr+svr_id-1}", netmask: "#{netmsk}"
+    config.vm.define "server1"
+    config.vm.box = "centos/7"
+    config.vm.network "private_network", ip: "#{svradr}", netmask: "#{netmsk}"
 
-      # Set-up Management Machine and VPN Server
-      if svr_id == 1
-        server.vm.hostname = "mgmt1"
-        f.puts "[mgmt1]"
-      end
-      if svr_id == 2
-        server.vm.hostname = "vpn1"
-        f.puts "[vpn1]"
-        server.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
-      end
-    f.puts "#{nwadr}.#{lastoctet_initadr+svr_id-1} ansible_ssh_user=#{linusr} ansible_ssh_private_key_file=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server#{svr_id}/#{VAGRANT_VM_PROVIDER}/private_key" 
+    config.vm.hostname = "vpn1"
+    f.puts "[vpn1]"
+    config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+    f.puts "#{svradr} ansible_ssh_user=#{linusr} ansible_ssh_private_key_file=#{ENV["VAGRANT_DOTFILE_PATH"]}/machines/server1/#{VAGRANT_VM_PROVIDER}/private_key" 
+
+  # Provision with Ansible
+    config.vm.provision :ansible do |ansible|
+      # Disable default limit to connect to all the machines
+        ansible.limit = "all"
+        ansible.playbook = "provision.yml"
+        ansible.inventory_path = "hosts"
+        #ansible.verbose = "-v"
+        ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
     end
-  end
+  # Write list of servers
+  # close inventory file writing pipe
+    f.close
 
-  # Set up Windows Servers
-  i = 1
-  (winsrvN..N).each do |machine_id|
-  config.vm.define "server#{machine_id}" do |machine|
-    machine.vm.box = "mwrock/Windows2012R2"
-    machine.vm.guest = :windows
-    # Set-up WinRM and RDP for Windows Machines
-    machine.vm.communicator = "winrm"
-    machine.winrm.username = "#{username}"
-    machine.winrm.password = "#{password}"
-    # Port forward WinRM and RDP (changed values to NOT conflict with host)
-    machine.vm.network "forwarded_port", host: 33389, guest: 3389, id: "rdp", auto_correct: true
-    machine.vm.network "forwarded_port", host: 5987, guest: 5985, id: "winrm", auto_correct: true
-	 if machine_id  <= N && machine_id > 0
-	     machine.vm.hostname = "dc#{i}"
-       f.puts "[dc#{i}]"
-       f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
-	 end
-	 if machine_id == N+1
-	     machine.vm.hostname = "wsus"
-       f.puts "[wsus]"
-       f.puts "#{nwadr}.#{lastoctet_initadr-1+machine_id}"
-	 end
-     machine.vm.network "private_network", ip: "#{nwadr}.#{lastoctet_initadr-1+machine_id}", netmask: "#{netmsk}"
-  
-     # Create a forwarded port mapping which allows access to a specific port
-     # within the machine from a port on the host machine. In the example below,
-     # accessing "localhost:8080" will access port 80 on the guest machine.
-      machine.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
-
-     # Customize the amount of memory on the VM:
-     #vb.memory = "1024"
-
-	 # Run Ansible from the Vagrant Host
-     # Only execute once the Ansible provisioner,
-     # when all the machines are up and ready.
-       if machine_id == N
-        # Provision with Ansible
-        machine.vm.provision :ansible do |ansible|
-           #Disable default limit to connect to all the machines
-           ansible.limit = "all"
-           ansible.playbook = "provision.yml"
-           ansible.inventory_path = "hosts"
-           #ansible.verbose = "-v"
-           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-		    end
-        
-        # Write list of servers
-        f.puts "[allservers:children]"
-        (winsrvN..N).each do |num|
-          if num < N
-            f.puts "dc#{num-winsrvN+1}"
-          end
-        end
-        f.puts "dc2"
-        f.puts "[allservers:vars]"
-        f.puts "ansible_ssh_user=Administrator"
-        f.puts "ansible_ssh_pass=vagrant"
-        f.puts "ansible_connection=winrm"
-        f.puts "ansible_ssh_port=5985"
-        f.puts "ansible_winrm_server_cert_validation=ignore"
-
-       # close inventory file writing pipe
-       f.close
-       # close group variable file writing pipe
-       end
-
-
-   i = i+1
-    end
-   end
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third

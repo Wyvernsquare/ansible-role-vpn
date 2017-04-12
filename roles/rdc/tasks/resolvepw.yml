@@ -1,3 +1,0 @@
-- name: Add new Domain Admin
-  script: "../../../ps-scripts/Add-DomainAdmin.ps1 -u {{ username }} -p {{ password }} -a {{ usradm }} -w {{ uadmpw }} -d {{ domain }}"
-  ignore_errors: yes

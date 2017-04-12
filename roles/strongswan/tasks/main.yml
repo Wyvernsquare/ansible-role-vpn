@@ -2,10 +2,10 @@
 #install & config ikev2 server
 
 - name: Install EPEL with strongswan
-  yum: pkg="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm" state=installed
+  package: name="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm" state=installed
 
 - name: Enforce strongswan is installed
-  yum: pkg={{ item }} state=installed
+  package: name={{ item }} state=installed
   with_items:
     - strongswan
     - xl2tpd
