@@ -9,15 +9,6 @@
     - radiusclient-ng-utils.x86_64
   tags: radius
 
-- debug:
-    msg: " {{ device_type }} "
-- debug:
-    msg: " {{ radius_servers }} "
-- debug:
-    msg: " {{ radius_servers.host }} "
-- debug:
-    msg: " {{ radius_servers.secret }} "
-
 - name:   upload radiusclient config for pptp
   action: template src=etc/radiusclient/{{ item }}
                     dest=/etc/radiusclient/{{ device_type }}-{{ item }}
@@ -26,6 +17,7 @@
     - radiusclient.conf
     - servers
     - dictionary
+    - port-id-map
   tags: radius
 
 - name: fix can't resolve own hostname problem  - hostname

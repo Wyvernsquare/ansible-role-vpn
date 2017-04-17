@@ -1,7 +1,7 @@
 ---
-ipsec_enable_l2tp: true
-ipsec_enable_ikev1: true
-ipsec_enable_ikev2: true
+ipsec_enable_l2tp: "{{ipsec_enable_l2tp}}"
+ipsec_enable_ikev1: "{{ipsec_enable_ikev1}}"
+ipsec_enable_ikev2: "{{ipsec_enable_ikev2}}"
 ipsec_enable_charondebug: false
 
 ipsec_remote_address: "{{ inventory_hostname }}"
@@ -19,12 +19,10 @@ ipsec_ikev1_radius_rightauth2: "xauth-eap"
 
 ipsec_use_radius: false
 ipsec_radius_servers:
-  - host: 127.0.0.1
-    secret: some-radius-secret
+  - host: "{{ipsecradius_host}}"
+    secret: "{{ipsecradius_secret}}"
 
-ipsec_dns_servers:
-   - "{{ dns }}"
-   - 8.8.8.8
+ipsec_dns_servers: "{{dns_servers}}"
 
 ipsec_psk: ipsecworks
 ipsec_cert_source: "gen" #upload, local, remote

@@ -1,19 +1,17 @@
 ---
-radius_servers:
-  host: 52.192.214.252
-  secret: "wyvernsquarebeerpizzaandfriends"
+radius_server_host: 52.192.214.252
+radius_server_secret: vpnsupersecretkey
 dns_servers:
-  - 8.8.8.8
+  - 172.31.30.104
   - 8.8.8.8
 ipsec_enable_ikev1: false
 ipsec_enable_ikev2: false
 ipsec_enable_l2tp: true
-ipsec_psk: wyvernsquarebeerpizzaandfriends
+ipsec_psk: vpnsupersecretkey
 ipsec_use_radius: true
 ipsec_dns_servers: "{{ dns_servers }}"
-ipsec_radius_servers:
-  host: 52.192.214.252
-  secret: wyvernsquarebeerpizzaandfriends
+ipsecradius_host: 52.192.214.252
+ipsecradius_secret: vpnsupersecretkey
 l2tp_server_name: "Wyvernsquare Staging"
 l2tp_network:
   local_ip: 172.31.27.1
@@ -21,9 +19,8 @@ l2tp_network:
   subnet: 172.31.27.0/24
 l2tp_dns_servers: "{{ dns_servers }}"
 l2tp_use_radius: true
-l2tp_radius_servers:
-  host: 52.192.214.252
-  secret: wyvernsquarebeerpizzaandfriends
+l2tpradius_host: 52.192.214.252
+l2tpradius_secret: vpnsupersecretkey
 l2tp_enable_nat: true
 l2tp_under_ipsec: true
 pptp_server_name: "Wyvernsquare Staging"
@@ -33,6 +30,5 @@ pptp_network:
   subnet: 172.31.27.0/24
 pptp_dns_servers: "{{ dns_servers }}"
 pptp_use_radius: true
-pptp_radius_servers:
-  host: 52.192.214.252
-  secret: wyvernsquarebeerpizzaandfriends
+pptpradius_host: 52.192.214.252
+pptpradius_secret: vpnsupersecretkey
